@@ -34,11 +34,14 @@ class Task:
 
 class Vertex:
 
-    def __init__(self, successors, number, index):
-        self.successors: list[int] = successors
+    def __init__(self, successors: list[int], number, index):
+        self.successors = successors
         self.predecessor_number = number
-        self.index = index
+        self.index: int = index
         self.visited = False
+
+    def sort_successors(self):
+        self.successors.sort()
 
     def __lt__(self, other):
         return self.index < other.index
@@ -56,19 +59,25 @@ class Vertex:
 class Vertices:
     def __init__(self, vertices: list[Vertex]):
         self.vertex: list[Vertex] = vertices
-        self.zero_predecessors_pq: PriorityQueue = PriorityQueue()
+        self.zero_predecessors_pq: PriorityQueue[Vertex] = PriorityQueue()
+        self.to_visit = len(vertices)
 
-        def init_priority(self):
-            for vertex in self.vertex:
-                if vertex.predecessor_number == 0:
-                    self.zero_predecessors_pq.put(vertex)
+    def init_priority(self):
+        for vertex in self.vertex:
+            if vertex.predecessor_number == 0:
+                self.zero_predecessors_pq.put(vertex)
 
-        init_priority(self)
+    def sort_vertex_successors(self):
+        for vertex in self.vertex:
+            vertex.sort_successors()
 
     def delete_vertex(self, index: int):
         for successor in self.vertex[index].successors:
-            self.vertex[successor].predecessor_number -= 1
-        self.vertex = self.vertex[:index] + self.vertex[index + 1 :]
+            successor_vert = self.vertex[successor]
+            successor_vert.predecessor_number -= 1
+            if successor_vert.predecessor_number == 0 and not successor_vert.visited:
+                self.zero_predecessors_pq.put(successor_vert)
+        self.to_visit -= 1
 
     def __str__(self):
         return "\n".join([str(vertex) for vertex in self.vertex])
@@ -85,15 +94,20 @@ vertices = Vertices([Vertex([], 0, i) for i in range(size_operation)])
 for edge in range(size_edges):
     start, end = map(int, input().split())
     vertices.vertex[start - 1].successors.append(end - 1)
-    vertices.vertex[start - 1].predecessor_number += 1
+    vertices.vertex[end - 1].predecessor_number += 1
 
-print(vertices)
+vertices.sort_vertex_successors()
+vertices.init_priority()
 
 
 def kahn_algorithm(vertices: Vertices) -> list[int]:
     output: list[int] = []
-    while len(vertices.vertex) > 0:
-        vertix = vertices.zero_predecessors_pq.get()
+    while vertices.to_visit > 0:
+        vertex = vertices.zero_predecessors_pq.get()
+        output.append(vertex.index + 1)
+        vertices.delete_vertex(vertex.index)
+        vertex.visited = True
+
     return output
 
 
