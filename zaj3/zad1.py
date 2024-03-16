@@ -102,7 +102,6 @@ for item in range(size_operation):
     operations.append(Task(relies_time, processing_time, item))
 
 size_edges = int(input())
-
 vertices = Vertices([Vertex([], 0, i) for i in range(size_operation)])
 for edge in range(size_edges):
     start, end = map(int, input().split())
