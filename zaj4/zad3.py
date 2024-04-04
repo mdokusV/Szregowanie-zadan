@@ -10,8 +10,6 @@ input_string = """6
 5 3 12"""
 sys.stdin = io.StringIO(input_string)
 
-size = int(input())
-
 
 class Task:
     def __init__(self, relies_time, processing_time, due_time, index):
@@ -30,23 +28,24 @@ class Task:
         return self.due_time == other.due_time
 
     def __str__(self):
-        return f"{self.relies_time} {self.processing_time} {self.index}"
-
+        return f"[{self.index}] relies_time:{self.relies_time} processing_time:{self.processing_time} due_time:{self.due_time} \n"
 
 from queue import PriorityQueue
 
-
+size = int(input())
 relies_table: list[Task] = []
-timestamps = []
+timestamps: list[int] = []
 for i in range(size):
     relies_time, processing_time, due_time = map(int, input().split())
     relies_table.append(Task(relies_time, processing_time, due_time, i))
     timestamps.append(relies_time)
 
 solution = [0 for _ in range(size)]
+timestamps.sort()
+relies_table.sort(key=lambda x: x.relies_time)
 
 pq: PriorityQueue[Task] = PriorityQueue()
-
+print(*relies_table)
 
 while len(timestamps) >= 2:
     time = timestamps.pop(1)
@@ -56,7 +55,10 @@ while len(timestamps) >= 2:
     while current_task.relies_time < time:
         if current_task.processing_time < time - current_task.relies_time:
             time_passed = current_task.processing_time + current_task.relies_time
-            solution[current_task.index] = time_passed
+            delay = time_passed - current_task.due_time
+            if delay < 0:
+                delay = 0
+            solution[current_task.index] = delay
 
             if not pq.empty():
                 current_task = pq.get()
@@ -75,8 +77,9 @@ pq.put(relies_table[0])
 while not pq.empty():
     current_task = pq.get()
     time = time + current_task.processing_time
-    solution[current_task.index] = time
+    delay = time_passed - current_task.due_time
+    if delay < 0:
+        delay = 0
+    solution[current_task.index] = delay
 
-for i in solution:
-    print(i)
-print(solution)
+print(max(solution))
