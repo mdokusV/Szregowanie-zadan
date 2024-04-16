@@ -33,15 +33,24 @@ class Machine:
 
     def __lt__(self, other):
         assert isinstance(other, Machine)
-        return self.weight < other.weight
+        return (self.weight, self.time_to_make_one_part) < (
+            other.weight,
+            other.time_to_make_one_part,
+        )
 
     def __gt__(self, other):
         assert isinstance(other, Machine)
-        return self.weight > other.weight
+        return (self.weight, self.time_to_make_one_part) > (
+            other.weight,
+            other.time_to_make_one_part,
+        )
 
     def __eq__(self, other):
         assert isinstance(other, Machine)
-        return self.weight == other.weight
+        return (self.weight, self.time_to_make_one_part) == (
+            other.weight,
+            other.time_to_make_one_part,
+        )
 
 
 class Task:
@@ -59,16 +68,12 @@ speeds = list(map(int, input().split()))
 machines = [Machine(i, speeds[i]) for i in range(machine_number)]
 
 
-print(*machines)
-
 tasks: list[Task] = []
 for i in range(task_number):
     tasks.append(Task(i, int(input())))
 
 tasks.sort(key=lambda task: task.number_of_parts, reverse=True)
-print(*tasks)
 
-# ! delete later
 for ind, task in enumerate(tasks):
     task.index = ind
 
@@ -78,12 +83,10 @@ for machine in machines:
     pq.put(machine)
 
 for task in tasks:
-
     machine = pq.get()
     machine.summed_time += task.number_of_parts * machine.time_to_make_one_part
-    task.finished = machine.summed_time
+    task.finished = task.number_of_parts * machine.weight
     machine.weight += machine.time_to_make_one_part
     pq.put(machine)
 
 print(sum(task.finished for task in tasks))
-print([task.finished for task in tasks])
