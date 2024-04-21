@@ -56,11 +56,10 @@ for j in range(1, task_number + 1):
         else:
             dynamic_matrix[j][t] = dynamic_matrix[j][current_task.due_time]
 
-print(dynamic_matrix[-1][-1])
 
 time = max_due_time
 items_taken = []
-for j in range(task_number, 1, -1):
+for j in range(task_number, 0, -1):
     current_task = tasks[j - 1]
     time = min(time, current_task.due_time)
     if dynamic_matrix[j][time] != dynamic_matrix[j - 1][time] + current_task.weight:
@@ -68,4 +67,5 @@ for j in range(task_number, 1, -1):
         time -= current_task.processing_time
 
 items_taken.sort()
+print(sum(tasks[i - 1].weight for i in items_taken))
 print(*items_taken, sep="\n")
