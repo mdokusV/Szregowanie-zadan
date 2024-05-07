@@ -49,7 +49,7 @@ class Node:
     def search(self):
         if self.weight > max_weight:
             return
-        if self.value > best_node.value:
+        if self.value > best_node.value and self.level == len(tasks):
             best_node.update(self)
         else:
             self.potential()
