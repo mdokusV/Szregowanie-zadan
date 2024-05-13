@@ -15,15 +15,16 @@ sys.stdin = io.StringIO(input_string)
 
 
 class Task:
-    def __init__(self, index, processing_time_one, processing_time_two):
+
+    def __init__(self, index: int, processing_time_one: int, processing_time_two: int):
         self.index = index
         self.processing_time_one = processing_time_one
         self.processing_time_two = processing_time_two
+        self.finished_one: int = 0
+        self.finished_two: int = 0
 
     def __str__(self):
-        return (
-            f"[{self.index}] F:{self.processing_time_one} S:{self.processing_time_two}"
-        )
+        return f"{self.index+1} {self.finished_one} {self.finished_two}"
 
 
 task_number = int(input())
@@ -35,15 +36,27 @@ for i in range(task_number):
         int, input().split()
     )
 
-print(*tasks, sep="\n")
 
-
-first_faster = []
-first_slower = []
+first_faster: list[Task] = []
+first_slower: list[Task] = []
 for task in tasks:
     if task.processing_time_one < task.processing_time_two:
         first_faster.append(task)
     else:
         first_slower.append(task)
 
-print(first_slower, first_faster)
+first_faster.sort(key=lambda task: task.processing_time_one)
+first_slower.sort(key=lambda task: task.processing_time_two, reverse=True)
+
+ordered_tasks = first_faster + first_slower
+time_one = 0
+time_two = 0
+
+for task in ordered_tasks:
+    time_one += task.processing_time_one
+    task.finished_one = time_one
+
+    time_two = max(time_one, time_two) + task.processing_time_two
+    task.finished_two = time_two
+
+    print(task)
