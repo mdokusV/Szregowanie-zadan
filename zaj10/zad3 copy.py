@@ -1,24 +1,3 @@
-# F||C_max - ILS
-
-import io
-import sys
-
-
-input_string = """10 10
-70 60 50 52 98 75 27 78 9 3 
-33 41 2 31 14 69 10 21 63 52 
-69 15 66 6 84 89 84 58 86 89 
-91 100 17 32 92 25 3 17 13 80 
-54 83 57 42 85 92 8 53 24 39 
-20 96 10 49 64 6 8 75 76 60 
-13 99 81 36 96 98 94 27 46 81 
-19 69 13 18 94 60 44 28 28 50 
-91 58 25 71 73 21 13 22 68 49 
-24 10 33 65 33 37 49 37 40 72 
-"""
-sys.stdin = io.StringIO(input_string)
-
-
 import random
 
 RNG = random.Random()
@@ -26,8 +5,8 @@ RNG = random.Random()
 
 class Param:
     def __init__(self):
-        self.ITER_MAX = 200
-        self.LOCAL_SEARCH = 50
+        self.ITER_MAX = 1000
+        self.LOCAL_SEARCH = 10
         self.PerturbationStrength = 0
 
 
@@ -38,7 +17,7 @@ class Task:
 
     def __init__(self, index: int):
         self.index = index
-        self.processing_times: list[int] = []
+        self.processing_times = []
         self.sum: int = 0
 
     def __str__(self):
@@ -55,7 +34,7 @@ class Task:
 
 
 class Order:
-    def __init__(self, tasks: list[Task]):
+    def __init__(self, tasks):
         self.tasks = tasks
         self.sum: int = 0
 
@@ -122,7 +101,7 @@ class Order:
 
 class Cache:
     def __init__(self):
-        self.cache_order: set[Order] = set()
+        self.cache_order = set()
 
 
 worker_number, task_number = map(int, input().split())
@@ -169,19 +148,14 @@ for i in range(PARAM.ITER_MAX):
         cache.cache_order.add(local_order)
 
         # if it is better then replace it and reset PerturbationStrength
-        if local_order.sum < best_order.sum or (
-            local_order.sum <= best_order.sum
-            and PARAM.PerturbationStrength > len(tasks) // 2
-        ):
+        if local_order.sum < best_order.sum:
             best_order.copy_order(local_order)
             PARAM.PerturbationStrength = 0
             order_missis = 0
 
     # if there are to many misses then increase PerturbationStrength
     if order_missis > PARAM.LOCAL_SEARCH:
-        if PARAM.PerturbationStrength < len(tasks):
-            PARAM.PerturbationStrength += 1
-
+        PARAM.PerturbationStrength += 1
 
 best_order.calculate_sum()
 print(best_order)

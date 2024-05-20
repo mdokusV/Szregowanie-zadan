@@ -20,7 +20,7 @@ class Task:
         self.sum: int = 0
 
     def __str__(self):
-        return f"[{self.index}] {self.processing_times} {self.sum}"
+        return f"{self.index+1}"
 
     def __lt__(self, other: "Task"):
         return self.sum > other.sum
@@ -37,6 +37,9 @@ class Order:
         self.tasks = tasks
         self.sum: int = 0
 
+    def __str__(self):
+        return f"{self.sum}\n" + " ".join([str(task) for task in self.tasks])
+
     def calculate_sum(self) -> int:
         times_of_workers = [0 for _ in range(worker_number)]
 
@@ -52,6 +55,12 @@ class Order:
 
         self.sum = times_of_workers[-1]
         return times_of_workers[-1]
+
+    def copy_other(self, other: "Order"):
+        for task_ind in range(len(other.tasks)):
+            self.tasks[task_ind] = other.tasks[task_ind]
+
+        self.sum = other.sum
 
     def next(self, new_task_placement_order: int):
         (
@@ -72,16 +81,19 @@ for i in range(task_number):
     tasks[i].sum = sum(tasks[i].processing_times)
 
 tasks.sort()
-print(*tasks, sep="\n")
 
 
 order_task = Order([])
-for tasks_taken in range(1, task_number + 1):
+
+for tasks_taken in range(task_number):
     order_task = Order([tasks[tasks_taken]] + order_task.tasks)
     order_task.calculate_sum()
-    checking_order = Order(order_task.tasks)
-    for new_task_placement_order in range(tasks_taken - 1):
+    checking_order = Order(order_task.tasks.copy())
+    for new_task_placement_order in range(tasks_taken):
         checking_order.next(new_task_placement_order)
         checking_order.calculate_sum()
         if checking_order.sum < order_task.sum:
-            order_task.tasks = checking_order.tasks
+            order_task.copy_other(checking_order)
+
+order_task.calculate_sum()
+print(order_task)
