@@ -35,6 +35,14 @@ class Machine:
         self.tasks_done: list[Task] = []
         self.setups_done: set[Setup] = set()
 
+    def sum_time(self) -> int:
+        time_sum = sum(task.processing_time for task in self.tasks_done)
+        time_sum += sum(setup.processing_time for setup in self.setups_done)
+        return time_sum
+
+    def __str__(self):
+        return f"machine {self.index}, tasks done: {[str(task) for task in self.tasks_done]}, setups done: {[str(setup) for setup in self.setups_done]}"
+
 
 task_number, setup_number, machine_number = 3, 2, 2
 
@@ -68,15 +76,16 @@ def get_permutation(n):
     ]
 
 
-def find_best():
+def find_best() -> tuple[list[Machine], int]:
     permutation_number = 0
     half_permutations = 2 ** (len(tasks) - 1)
 
-    miniman_summed_time = float("inf")
+    minimal_summed_time = float("inf")
+    best_arrangement = [Machine(i) for i in range(machine_number)]
 
+    times = [0 for _ in range(machine_number)]
     while permutation_number <= half_permutations:
         task_to_machines = get_permutation(permutation_number)
-        print(f"permutation number: {permutation_number}")
         for machine_ind, machine in enumerate(machines):
             machine.setups_done.clear()
             machine.tasks_done.clear()
@@ -86,6 +95,8 @@ def find_best():
                 setup for task in task_to_machines[machine_ind] for setup in task.setups
             )
 
+            times[machine_ind] = machine.sum_time()
+
             # print(
             #     f"""
             #         machine {machine_ind}
@@ -93,7 +104,16 @@ def find_best():
             #         setups {[setup.index for setup in machine.setups_done]}
             #     """
             # )
+        if max(times) < minimal_summed_time:
+            minimal_summed_time = max(times)
+            best_arrangement = machines.copy()
+
         permutation_number += 1
 
+    return best_arrangement, int(minimal_summed_time)
 
-find_best()
+
+best_arrangement, minimal_summed_time = find_best()
+
+print(*best_arrangement, sep="\n")
+print(minimal_summed_time)
