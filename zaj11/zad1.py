@@ -28,7 +28,7 @@ RNG = random.Random()
 
 class Param:
     def __init__(self):
-        self.ITER_MAX = 1000
+        self.ITER_MAX = 10000
         self.temperature = 50
         self.FREEZING = 0.875
 
@@ -118,6 +118,7 @@ class Order:
             self.tasks[swap_index],
             self.tasks[take],
         )
+        # self.sum = old_sum
         PARAM.update_temp()
         return 1
 
