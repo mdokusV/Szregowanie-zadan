@@ -28,8 +28,9 @@ RNG = random.Random()
 
 class Param:
     def __init__(self):
-        self.ITER_MAX = 10000
-        self.temperature = 50
+        self.ITER_MAX = 1000
+        self.TEMPERATURE_START = 17
+        self.temperature = self.TEMPERATURE_START
         self.FREEZING = 0.875
 
     def update_temp(self):
@@ -102,14 +103,18 @@ class Order:
         self.calculate_sum()
 
         if self.sum < old_sum:
+            print([task.index for task in order.tasks], order.sum, missis)
             if self.sum < best_order.sum:
+                PARAM.temperature = PARAM.TEMPERATURE_START
                 best_order.copy_order(self)
+                return -missis
             return 0
 
-        if -exp((old_sum - self.sum) / PARAM.temperature) > RNG.random():
+        if exp((old_sum - self.sum) / PARAM.temperature) > RNG.random():
+            print([task.index for task in order.tasks], order.sum, missis)
             if self.sum < best_order.sum:
                 best_order.copy_order(self)
-            return 0
+            return 1
 
         (
             self.tasks[take],
@@ -118,7 +123,7 @@ class Order:
             self.tasks[swap_index],
             self.tasks[take],
         )
-        # self.sum = old_sum
+        self.sum = old_sum
         PARAM.update_temp()
         return 1
 
