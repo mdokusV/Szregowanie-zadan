@@ -1,5 +1,6 @@
 # tester.py
 
+from dataclasses import dataclass
 import subprocess
 import time
 import concurrent.futures
@@ -14,9 +15,13 @@ from io import BytesIO
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
-sizes = [5, 10, 15, 20]
-num_instances = 10
 
+sizes = [5, 10, 15, 20, 25, 30, 50]
+num_instances = [3, 10, 10, 5, 3, 2, 2]
+
+if len(sizes) != len(num_instances):
+    logging.error("Size and number of instances lists must have the same length.")
+    raise ValueError("Size and number of instances lists must have the same length.")
 
 def generate_test_instance(task_number, worker_number):
     processing_times = [
@@ -50,12 +55,12 @@ def run_tests() -> dict[str, dict[int, list[tuple[float, float]]]]:
         "SA": {},
     }
 
-    for size in sizes:
+    for i, size in enumerate(sizes):
         results["GA"][size] = []
         results["ILS"][size] = []
         results["SA"][size] = []
         logging.info(f"Running tests for size: {size}")
-        for _ in range(num_instances):
+        for _ in range(num_instances[i]):
             input_data = generate_test_instance(size, size)
 
             with concurrent.futures.ThreadPoolExecutor() as executor:
