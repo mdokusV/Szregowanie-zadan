@@ -152,7 +152,7 @@ def generate_report(averaged_results: dict[str, dict[int, tuple[float, float]]])
     fig_quality.savefig(img_buffer_quality, format="png")
     img_buffer_quality.seek(0)
 
-    c = canvas.Canvas("report.pdf", pagesize=letter)
+    c = canvas.Canvas("plots.pdf", pagesize=letter)
     width, height = letter
     y = height
 
