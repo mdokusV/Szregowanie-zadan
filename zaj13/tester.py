@@ -16,8 +16,11 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-sizes = [5, 10, 15, 20, 25, 30, 50]
-num_instances = [3, 10, 10, 5, 3, 2, 2]
+sizes = [5, 10, 15, 20, 25, 30, 50, 80]
+num_instances = [3, 10, 10, 5, 5, 3, 3, 2]
+
+# sizes = [5, 10]
+# num_instances = [1, 1]
 
 if len(sizes) != len(num_instances):
     logging.error("Size and number of instances lists must have the same length.")
@@ -151,12 +154,9 @@ def generate_report(averaged_results: dict[str, dict[int, tuple[float, float]]])
 
     c = canvas.Canvas("report.pdf", pagesize=letter)
     width, height = letter
+    y = height
 
-    c.setFont("Helvetica", 12)
-    c.drawString(100, height - 50, "Comparative Analysis of Scheduling Algorithms")
-    c.drawString(100, height - 70, "Execution Time and Solution Quality")
-
-    y = height - 100
+    y = y - 100
 
     # Draw the execution time plot image
     c.drawImage(ImageReader(img_buffer_time), 100, y - 300, width=400, height=300)
